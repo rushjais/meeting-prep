@@ -16,13 +16,27 @@ from chat import router as chat_router
 
 app = FastAPI(title="M13 Meeting Prep API")
 
+
 app.add_middleware(
+
     CORSMiddleware,
+
     allow_origins=[
-    "http://localhost:5173",
-    "http://localhost:3000",
-    "https://*.vercel.app",
-],
+
+        "http://localhost:5173",
+
+        "http://localhost:3000",
+
+        "https://*.vercel.app",
+
+        "https://meeting-prep-rjaiswal29-1774s-projects.vercel.app/", 
+
+    ],
+
+    allow_methods=["*"],
+
+    allow_headers=["*"],
+
 )
 
 app.include_router(benchmark_router)
