@@ -29,7 +29,7 @@ app.add_middleware(
 
         "https://*.vercel.app",
 
-        "https://meeting-prep-rjaiswal29-1774s-projects.vercel.app/", 
+        "https://meeting-prep-eight.vercel.app/", 
 
     ],
 
