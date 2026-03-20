@@ -6,6 +6,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/brief': 'http://localhost:8000',
+      '/benchmark': 'http://localhost:8000',
+      '/chat': 'http://localhost:8000',
       '/health': 'http://localhost:8000',
     }
   }

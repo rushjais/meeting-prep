@@ -11,6 +11,8 @@ load_dotenv()
 
 from orchestrator import run_orchestrator
 from pdf_generator import generate_pdf
+from benchmark import router as benchmark_router
+from chat import router as chat_router
 
 app = FastAPI(title="M13 Meeting Prep API")
 
@@ -21,10 +23,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(benchmark_router)
+app.include_router(chat_router)
+
 
 class BriefRequest(BaseModel):
     company_name: str
-    meeting_context: str  # e.g. "Series A intro call with founder"
+    meeting_context: str
     founder_name: str = ""
 
 
@@ -40,10 +45,6 @@ async def health():
 
 @app.post("/brief/stream")
 async def brief_stream(req: BriefRequest):
-    """
-    Streams the briefing doc as it's generated.
-    Yields SSE-style chunks: data: {"type": "status"|"content"|"done", "text": "..."}
-    """
     async def event_generator():
         try:
             async for chunk in run_orchestrator(
@@ -52,25 +53,19 @@ async def brief_stream(req: BriefRequest):
                 founder_name=req.founder_name,
             ):
                 yield f"data: {json.dumps(chunk)}\n\n"
-                await asyncio.sleep(0)  # allow event loop to breathe
+                await asyncio.sleep(0)
         except Exception as e:
             yield f"data: {json.dumps({'type': 'error', 'text': str(e)})}\n\n"
 
     return StreamingResponse(
         event_generator(),
         media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "X-Accel-Buffering": "no",
-        },
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
 
 
 @app.post("/brief/pdf")
 async def brief_pdf(req: PDFRequest):
-    """
-    Converts a markdown briefing to a downloadable PDF.
-    """
     try:
         pdf_path = generate_pdf(req.markdown_content, req.company_name)
         return FileResponse(
