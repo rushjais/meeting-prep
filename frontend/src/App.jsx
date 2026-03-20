@@ -4,7 +4,7 @@ import remarkGfm from 'remark-gfm'
 import Benchmark from './Benchmark.jsx'
 import ChatPanel from './ChatPanel.jsx'
 
-const API_BASE = ''
+const API_BASE = import.meta.env.VITE_API_BASE || ''
 
 const EXAMPLE_COMPANIES = [
   { company: 'Cursor', context: 'Series A intro call with co-founder', founder: 'Aman Sanger' },
